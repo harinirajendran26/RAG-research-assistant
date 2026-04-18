@@ -5,7 +5,7 @@ Upload PDFs, add web URLs, paste notes — ask questions across all sources
 with cited answers, conversation memory, agentic tool use, and live RAGAS evaluation.
 
 ## Live Demo
-[Add Streamlit Cloud link after deployment]
+https://rag-research-assistant-hzhpncsup3zwwdshykghfm.streamlit.app/
 
 ## Features
 - Multi-source ingestion — PDFs, web URLs, plain text notes
