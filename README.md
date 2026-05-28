@@ -8,13 +8,17 @@ with cited answers, conversation memory, agentic tool use, and live RAGAS evalua
 https://rag-research-assistant-hzhpncsup3zwwdshykghfm.streamlit.app/
 
 ## Features
-- Multi-source ingestion — PDFs, web URLs, plain text notes
+- Multi-source ingestion — PDFs, DOCX, TXT, web URLs, plain text
 - Cross-encoder re-ranking for precise retrieval
+- Streaming responses — tokens appear as they generate
 - Agentic mode — agent decides which tool to use per question
-- Web search for live internet results
+- Live web search for current information
 - RAGAS evaluation dashboard with 4 metrics
+- Latency + cost tracking on every query
+- Export chat as PDF report
 - Conversation memory for follow-up questions
 - Source citations on every answer
+- Cream and burgundy UI with Playfair Display typography
 
 ## Tech Stack
 
