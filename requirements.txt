@@ -18,15 +18,5 @@ beautifulsoup4
 requests
 duckduckgo-search
 ddgs
-# ── Show loading screen immediately while models load ─────────────────────────
-if "models_loaded" not in st.session_state:
-    st.session_state.models_loaded = False
-
-if not st.session_state.models_loaded:
-    with st.spinner("🔬 Starting up Research Assistant — first load takes ~30 seconds..."):
-        # This forces models to cache immediately on first visit
-        _ = get_embeddings()
-        _ = get_reranker()
-        _ = get_llm()
-        st.session_state.models_loaded = True
-    st.rerun()
+python-docx
+reportlab
