@@ -24,7 +24,8 @@ except Exception:
 st.set_page_config(
     page_title="Research Assistant",
     page_icon="🔬",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"    # ← ADD THIS
 )
 
 st.markdown("""
@@ -49,6 +50,12 @@ header    { visibility: hidden; }
 [data-testid="stSidebar"] {
     background: #3d0c11 !important;
     border-right: 1px solid #6b1a22;
+}
+[data-testid="stAppViewContainer"] {
+    background: #fdf6ee !important;
+}
+[data-testid="stChatInputContainer"] {
+    background: #fdf6ee !important;
 }
 [data-testid="stSidebar"] p,
 [data-testid="stSidebar"] span,

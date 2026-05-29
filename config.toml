@@ -1,0 +1,17 @@
+[server]
+maxUploadSize = 50
+
+[client]
+showErrorDetails = false
+
+[server]
+maxUploadSize = 50
+
+[browser]
+gatherUsageStats = false
+
+[ui]
+hideSidebarNav = false
+
+[theme]
+base = "light"
