@@ -9,7 +9,16 @@ from rag_engine import (
     answer, answer_stream, get_loaded_sources
 )
 from agent import run_agent
-from evaluator import run_evaluation
+
+try:
+    from evaluator import run_evaluation
+    EVAL_AVAILABLE = True
+except Exception:
+    EVAL_AVAILABLE = False
+    def run_evaluation(*args, **kwargs):
+        return {"error": "Evaluation unavailable", "faithfulness": None,
+                "answer_relevancy": None, "context_precision": None,
+                "context_recall": None, "dataframe": None}
 
 # ── Page config ───────────────────────────────────────────────────────────────
 st.set_page_config(

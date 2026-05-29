@@ -5,18 +5,31 @@ from ragas.llms import LangchainLLMWrapper
 from ragas.embeddings import LangchainEmbeddingsWrapper
 
 
-def run_evaluation(
-    questions: list,
-    ground_truths: list,
-    answers: list,
-    contexts: list,
-    llm,
-    embeddings_model
-) -> dict:
-    """
-    Run RAGAS evaluation on a set of questions and answers.
-    Returns dict of metric scores.
-    """
+try:
+    from ragas import evaluate
+    from ragas.metrics import (
+        Faithfulness, AnswerRelevancy,
+        ContextPrecision, ContextRecall
+    )
+    from ragas.llms import LangchainLLMWrapper
+    from ragas.embeddings import LangchainEmbeddingsWrapper
+    from datasets import Dataset
+    RAGAS_AVAILABLE = True
+except Exception:
+    RAGAS_AVAILABLE = False
+
+
+def run_evaluation(questions, ground_truths, answers, contexts, llm, embeddings_model):
+    if not RAGAS_AVAILABLE:
+        return {
+            "faithfulness": None,
+            "answer_relevancy": None,
+            "context_precision": None,
+            "context_recall": None,
+            "dataframe": None,
+            "error": "RAGAS unavailable on this Python version. Run evaluation locally."
+        }
+
     try:
         dataset = Dataset.from_dict({
             "question":     questions,
@@ -25,8 +38,8 @@ def run_evaluation(
             "ground_truth": ground_truths,
         })
 
-        ragas_llm  = LangchainLLMWrapper(llm)
-        ragas_emb  = LangchainEmbeddingsWrapper(embeddings_model)
+        ragas_llm = LangchainLLMWrapper(llm)
+        ragas_emb = LangchainEmbeddingsWrapper(embeddings_model)
 
         results = evaluate(
             dataset    = dataset,
@@ -46,8 +59,7 @@ def run_evaluation(
             if col in df.columns:
                 vals = df[col].dropna()
                 if len(vals) > 0:
-                    v = float(vals.mean())
-                    return round(v, 3)
+                    return round(float(vals.mean()), 3)
             return None
 
         return {
