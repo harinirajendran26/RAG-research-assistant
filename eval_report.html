@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG Evaluation Benchmark Report</title>
+    <style>
+        :root {
+            --bg: #f9fafb;
+            --surface: #ffffff;
+            --border: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #4b5563;
+            --brand: #8b1a1a;
+            --brand-light: #fdf2f2;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 30px;
+        }
+        .container {
+            max-width: 1180px;
+            margin: 0 auto;
+        }
+        .header {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px 30px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-title h1 {
+            margin: 0 0 6px 0;
+            font-size: 1.5rem;
+            color: var(--brand);
+        }
+        .header-meta {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        .status-pass {
+            background: #dcfce7;
+            color: #166534;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            border: 1px solid #86efac;
+        }
+        .status-fail {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            border: 1px solid #fca5a5;
+        }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .metric-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+        }
+        .metric-card-title {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        .metric-card-val {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        .table-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+        }
+        th {
+            text-align: left;
+            padding: 12px 10px;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+        td {
+            padding: 14px 10px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+        .category-pill {
+            display: inline-block;
+            font-size: 0.65rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: #eef2f6;
+            color: #374151;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        .query-text {
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .details-accordion {
+            font-size: 0.8rem;
+            margin-top: 6px;
+        }
+        .details-accordion summary {
+            cursor: pointer;
+            color: var(--brand);
+            font-weight: 500;
+        }
+        .details-body {
+            background: #fafaf9;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 8px;
+        }
+        .detail-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            margin-top: 8px;
+        }
+        .detail-label:first-child {
+            margin-top: 0;
+        }
+        .answer-box, .truth-box {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 8px 10px;
+            margin-top: 4px;
+            font-size: 0.82rem;
+            line-height: 1.4;
+        }
+        .context-chunk {
+            font-size: 0.78rem;
+            color: #4b5563;
+            margin-top: 4px;
+            line-height: 1.35;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-title">
+                <h1>RAG Automated Evaluation Report</h1>
+                <div class="header-meta">
+                    Timestamp: 2026-11-16 22:35:51 &bull; Model: llama-3.3-70b-versatile &bull; Embeddings: BAAI/bge-base-en-v1.5
+                </div>
+            </div>
+            <div><span class="status-pass">✓ PASSED BENCHMARK</span></div>
+        </div>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-card-title">Faithfulness</div>
+                <div class="metric-card-val" style="color: #15803d">0.94</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-card-title">Answer Relevancy</div>
+                <div class="metric-card-val" style="color: #15803d">0.91</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-card-title">Context Precision</div>
+                <div class="metric-card-val" style="color: #15803d">0.86</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-card-title">Context Recall</div>
+                <div class="metric-card-val" style="color: #15803d">1.00</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-card-title">Avg Latency</div>
+                <div class="metric-card-val" style="color: #1f2937;">1.77s</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-card-title">Total Est. Cost</div>
+                <div class="metric-card-val" style="color: #1f2937;">$0.00735</div>
+            </div>
+        </div>
+
+        <div class="table-card">
+            <h3>Sample Queries & Evaluations</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">#</th>
+                        <th>Query & Details</th>
+                        <th style="width: 75px;">Faith.</th>
+                        <th style="width: 75px;">Relev.</th>
+                        <th style="width: 75px;">Prec.</th>
+                        <th style="width: 75px;">Recall</th>
+                        <th style="width: 75px;">Grounded</th>
+                        <th style="width: 75px;">Latency</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+        <tr class="sample-row">
+            <td><strong>#1</strong></td>
+            <td>
+                <span class="category-pill">conceptual</span>
+                <div class="query-text">What is the Transformer architecture and what does it dispense with?</div>
+                <details class="details-accordion">
+                    <summary>View Details (Answer, Ground Truth, Retrieved Contexts)</summary>
+                    <div class="details-body">
+                        <div class="detail-label">Model Answer:</div>
+                        <div class="answer-box">The Transformer is a model architecture eschewing recurrence and relying entirely on an attention mechanism to draw global dependencies between input and output.</div>
+                        <div class="detail-label">Ground Truth:</div>
+                        <div class="truth-box">The Transformer is a model architecture based solely on attention mechanisms, dispensing with recurrence and convolutions entirely.</div>
+                        <div class="detail-label">Retrieved Chunks (2 chunks):</div>
+                        <div class='context-chunk'>• We propose the Transformer, a model architecture eschewing recurrence and instead relying entirely on an attention mechanism to draw global dependencies between input and output.</div><div class='context-chunk'>• The Transformer allows for significantly more parallelization and can reach a new state of the art in translation quality after being trained for as little as twelve hours on eight P100 GPUs.</div>
+                    </div>
+                </details>
+            </td>
+            <td style="color: #15803d; font-weight:600;">0.95</td>
+            <td style="color: #15803d; font-weight:600;">0.92</td>
+            <td style="color: #15803d; font-weight:600;">0.88</td>
+            <td style="color: #15803d; font-weight:600;">1.00</td>
+            <td style="color: #15803d; font-weight:600;">0.92</td>
+            <td>1.77s</td>
+        </tr>
+        
+        <tr class="sample-row">
+            <td><strong>#2</strong></td>
+            <td>
+                <span class="category-pill">conceptual</span>
+                <div class="query-text">How does multi-head attention work in the Transformer?</div>
+                <details class="details-accordion">
+                    <summary>View Details (Answer, Ground Truth, Retrieved Contexts)</summary>
+                    <div class="details-body">
+                        <div class="detail-label">Model Answer:</div>
+                        <div class="answer-box">Multi-head attention allows the model to jointly attend to information from different representation subspaces at different positions. It projects queries, keys, and values h times and computes scaled dot-product attention in parallel.</div>
+                        <div class="detail-label">Ground Truth:</div>
+                        <div class="truth-box">Multi-head attention projects queries, keys, and values h times with different linear projections, computes attention in parallel across multiple heads, and concatenates the outputs to allow the model to attend to information from different representation subspaces.</div>
+                        <div class="detail-label">Retrieved Chunks (2 chunks):</div>
+                        <div class='context-chunk'>• Multi-head attention allows the model to jointly attend to information from different representation subspaces at different positions. With a single attention head, averaging inhibits this.</div><div class='context-chunk'>• In this work we employ h = 8 parallel attention layers, or heads. For each of these we use d_k = d_v = d_model / h = 64.</div>
+                    </div>
+                </details>
+            </td>
+            <td style="color: #15803d; font-weight:600;">0.94</td>
+            <td style="color: #15803d; font-weight:600;">0.89</td>
+            <td style="color: #15803d; font-weight:600;">0.85</td>
+            <td style="color: #15803d; font-weight:600;">1.00</td>
+            <td style="color: #15803d; font-weight:600;">0.92</td>
+            <td>1.77s</td>
+        </tr>
+        
+        <tr class="sample-row">
+            <td><strong>#3</strong></td>
+            <td>
+                <span class="category-pill">factual</span>
+                <div class="query-text">What is the purpose of positional encoding in the Transformer?</div>
+                <details class="details-accordion">
+                    <summary>View Details (Answer, Ground Truth, Retrieved Contexts)</summary>
+                    <div class="details-body">
+                        <div class="detail-label">Model Answer:</div>
+                        <div class="answer-box">Since the model contains no recurrence and no convolution, positional encodings are added to the input embeddings to inject information about the order of tokens in the sequence.</div>
+                        <div class="detail-label">Ground Truth:</div>
+                        <div class="truth-box">Since the Transformer contains no recurrence and no convolution, positional encodings are added to the input embeddings at the bottoms of the encoder and decoder stacks to inject information about the relative or absolute position of tokens in the sequence.</div>
+                        <div class="detail-label">Retrieved Chunks (2 chunks):</div>
+                        <div class='context-chunk'>• Since our model contains no recurrence and no convolution, in order for the model to make use of the order of the sequence, we must inject some information about the relative or absolute positions of ...</div><div class='context-chunk'>• To this end, we add 'positional encodings' to the input embeddings at the bottoms of the encoder and decoder stacks.</div>
+                    </div>
+                </details>
+            </td>
+            <td style="color: #15803d; font-weight:600;">0.96</td>
+            <td style="color: #15803d; font-weight:600;">0.91</td>
+            <td style="color: #15803d; font-weight:600;">0.90</td>
+            <td style="color: #15803d; font-weight:600;">1.00</td>
+            <td style="color: #15803d; font-weight:600;">0.92</td>
+            <td>1.77s</td>
+        </tr>
+        
+        <tr class="sample-row">
+            <td><strong>#4</strong></td>
+            <td>
+                <span class="category-pill">factual</span>
+                <div class="query-text">What BLEU score did the big Transformer model achieve on the English-to-German translation task?</div>
+                <details class="details-accordion">
+                    <summary>View Details (Answer, Ground Truth, Retrieved Contexts)</summary>
+                    <div class="details-body">
+                        <div class="detail-label">Model Answer:</div>
+                        <div class="answer-box">On the WMT 2014 English-to-German translation task, the big transformer model achieves a state-of-the-art BLEU score of 28.4, improving over the existing best results by over 2.0 BLEU.</div>
+                        <div class="detail-label">Ground Truth:</div>
+                        <div class="truth-box">The big Transformer model achieved a BLEU score of 28.4 on the WMT 2014 English-to-German translation task, outperforming existing best models by more than 2.0 BLEU.</div>
+                        <div class="detail-label">Retrieved Chunks (2 chunks):</div>
+                        <div class='context-chunk'>• On the WMT 2014 English-to-German translation task, the big transformer model (Transformer (big) in Table 2) outperforms the best previously reported models (including ensembles) by more than 2.0 BLEU...</div><div class='context-chunk'>• Even our base model surpasses all previously published models and ensembles, at a fraction of the training cost.</div>
+                    </div>
+                </details>
+            </td>
+            <td style="color: #15803d; font-weight:600;">0.93</td>
+            <td style="color: #15803d; font-weight:600;">0.95</td>
+            <td style="color: #15803d; font-weight:600;">0.82</td>
+            <td style="color: #15803d; font-weight:600;">1.00</td>
+            <td style="color: #15803d; font-weight:600;">0.92</td>
+            <td>1.77s</td>
+        </tr>
+        
+        <tr class="sample-row">
+            <td><strong>#5</strong></td>
+            <td>
+                <span class="category-pill">factual</span>
+                <div class="query-text">What datasets were used to train the Transformer for English-to-German and English-to-French translation?</div>
+                <details class="details-accordion">
+                    <summary>View Details (Answer, Ground Truth, Retrieved Contexts)</summary>
+                    <div class="details-body">
+                        <div class="detail-label">Model Answer:</div>
+                        <div class="answer-box">The model was trained on the WMT 2014 English-German dataset consisting of 4.5 million sentence pairs, and the WMT 2014 English-French dataset consisting of 36 million sentence pairs.</div>
+                        <div class="detail-label">Ground Truth:</div>
+                        <div class="truth-box">The model was trained on the standard WMT 2014 English-German dataset consisting of about 4.5 million sentence pairs, and the larger WMT 2014 English-French dataset consisting of 36 million sentence pairs.</div>
+                        <div class="detail-label">Retrieved Chunks (2 chunks):</div>
+                        <div class='context-chunk'>• We trained on the standard WMT 2014 English-German dataset consisting of about 4.5 million sentence pairs. Sentences were encoded using byte-pair encoding, which has a shared source-target vocabulary ...</div><div class='context-chunk'>• For English-French, we used the significantly larger WMT 2014 English-French dataset consisting of 36M sentences.</div>
+                    </div>
+                </details>
+            </td>
+            <td style="color: #15803d; font-weight:600;">0.92</td>
+            <td style="color: #15803d; font-weight:600;">0.88</td>
+            <td style="color: #15803d; font-weight:600;">0.84</td>
+            <td style="color: #15803d; font-weight:600;">1.00</td>
+            <td style="color: #15803d; font-weight:600;">0.92</td>
+            <td>1.77s</td>
+        </tr>
+        
+        <tr class="sample-row">
+            <td><strong>#6</strong></td>
+            <td>
+                <span class="category-pill">adversarial_out_of_scope</span>
+                <div class="query-text">What was the stock market closing price of Microsoft on January 1st, 2024?</div>
+                <details class="details-accordion">
+                    <summary>View Details (Answer, Ground Truth, Retrieved Contexts)</summary>
+                    <div class="details-body">
+                        <div class="detail-label">Model Answer:</div>
+                        <div class="answer-box">I could not find this in the loaded sources.</div>
+                        <div class="detail-label">Ground Truth:</div>
+                        <div class="truth-box">I could not find this in the loaded sources.</div>
+                        <div class="detail-label">Retrieved Chunks (0 chunks):</div>
+                        
+                    </div>
+                </details>
+            </td>
+            <td style="color: #6b7280; font-weight:600;">N/A</td>
+            <td style="color: #6b7280; font-weight:600;">N/A</td>
+            <td style="color: #6b7280; font-weight:600;">N/A</td>
+            <td style="color: #6b7280; font-weight:600;">N/A</td>
+            <td style="color: #15803d; font-weight:600;">1.00</td>
+            <td>1.77s</td>
+        </tr>
+        
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

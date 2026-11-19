@@ -1,0 +1,38 @@
+[
+  {
+    "id": "q1_architecture",
+    "category": "conceptual",
+    "question": "What is the Transformer architecture and what does it dispense with?",
+    "ground_truth": "The Transformer is a model architecture based solely on attention mechanisms, dispensing with recurrence and convolutions entirely."
+  },
+  {
+    "id": "q2_multihead",
+    "category": "conceptual",
+    "question": "How does multi-head attention work in the Transformer?",
+    "ground_truth": "Multi-head attention projects queries, keys, and values h times with different linear projections, computes attention in parallel across multiple heads, and concatenates the outputs to allow the model to attend to information from different representation subspaces."
+  },
+  {
+    "id": "q3_positional",
+    "category": "factual",
+    "question": "What is the purpose of positional encoding in the Transformer?",
+    "ground_truth": "Since the Transformer contains no recurrence and no convolution, positional encodings are added to the input embeddings at the bottoms of the encoder and decoder stacks to inject information about the relative or absolute position of tokens in the sequence."
+  },
+  {
+    "id": "q4_bleu_score",
+    "category": "factual",
+    "question": "What BLEU score did the big Transformer model achieve on the English-to-German translation task?",
+    "ground_truth": "The big Transformer model achieved a BLEU score of 28.4 on the WMT 2014 English-to-German translation task, outperforming existing best models by more than 2.0 BLEU."
+  },
+  {
+    "id": "q5_training_data",
+    "category": "factual",
+    "question": "What datasets were used to train the Transformer for English-to-German and English-to-French translation?",
+    "ground_truth": "The model was trained on the standard WMT 2014 English-German dataset consisting of about 4.5 million sentence pairs, and the larger WMT 2014 English-French dataset consisting of 36 million sentence pairs."
+  },
+  {
+    "id": "q6_out_of_scope",
+    "category": "adversarial_out_of_scope",
+    "question": "What was the stock market closing price of Microsoft on January 1st, 2024?",
+    "ground_truth": "I could not find this in the loaded sources."
+  }
+]

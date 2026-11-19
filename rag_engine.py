@@ -45,15 +45,26 @@ def get_latest_chroma_path() -> str:
 
 # ── Model loaders ─────────────────────────────────────────────────────────────
 def load_embeddings_model():
-    return HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
+    try:
+        return HuggingFaceEmbeddings(
+            model_name=EMBEDDING_MODEL,
+            model_kwargs={"local_files_only": True}
+        )
+    except Exception:
+        return HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
 
 def load_reranker():
-    return CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
+    try:
+        return CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2", local_files_only=True)
+    except Exception:
+        return CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
 
 def load_llm():
+    model_name = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+    api_key = (os.getenv("GROQ_API_KEY") or "").strip()
     return ChatGroq(
-        model="openai/gpt-oss-120b",
-        api_key=os.getenv("GROQ_API_KEY")
+        model=model_name,
+        api_key=api_key
     )
 
 def load_vectorstore(embeddings_model):
@@ -394,6 +405,48 @@ Be direct and specific — never give evasive answers."""),
         full_response += token
         yield token
 
+# ── Groundedness / Hallucination verifier ──────────────────────────────────────
+def compute_groundedness(answer: str, contexts: list) -> dict:
+    """
+    Computes real-time groundedness and hallucination resistance.
+    Measures overlap of key answer tokens against retrieved context.
+    Runs deterministically in < 1ms with 0 extra API calls.
+    """
+    if not answer or not contexts:
+        return {"score": 0.0, "label": "No Context", "pct": 0}
+
+    refusal_cues = ["could not find", "not in the loaded sources", "not found in", "no information"]
+    if any(cue in answer.lower() for cue in refusal_cues):
+        return {"score": 1.0, "label": "🟢 Grounded Refusal", "pct": 100}
+
+    combined_context = " ".join(contexts).lower() if isinstance(contexts[0], str) else " ".join([c.page_content for c in contexts]).lower()
+    words = [w.strip(".,;:?!'\"()[]{}").lower() for w in answer.split()]
+    stopwords = {
+        "the", "a", "an", "is", "are", "was", "were", "in", "on", "at", "to",
+        "for", "of", "and", "or", "it", "this", "that", "with", "as", "by",
+        "from", "be", "has", "have", "had", "not", "source", "type", "section",
+        "which", "also", "been", "their", "there", "these", "other", "into",
+        "then", "they", "them", "more", "such", "than", "each", "used"
+    }
+    content_words = [w for w in words if len(w) > 3 and w not in stopwords]
+
+    if not content_words:
+        return {"score": 1.0, "label": "🟢 High Grounding", "pct": 100}
+
+    hits = sum(1 for w in content_words if w in combined_context)
+    ratio = hits / len(content_words)
+    pct = min(100, int(ratio * 100))
+
+    if pct >= 75:
+        label = "🟢 High Grounding"
+    elif pct >= 50:
+        label = "🟡 Moderate Grounding"
+    else:
+        label = "🔴 Low Grounding"
+
+    return {"score": round(ratio, 2), "label": label, "pct": pct}
+
+
 # ── Cost estimator ────────────────────────────────────────────────────────────
 def estimate_cost(text: str) -> dict:
     """
@@ -466,13 +519,16 @@ def answer(
             seen.add(key)
 
     # ── Build metrics dict ────────────────────────────────────────────────────
+    groundedness = compute_groundedness(response, [doc.page_content for doc in chunks])
     metrics = {
         "retrieval_time_s":  retrieval_time,
         "generation_time_s": generation_time,
         "total_time_s":      total_time,
         "chunks_retrieved":  len(chunks),
         "estimated_tokens":  cost_info["estimated_tokens"],
-        "estimated_cost_usd": cost_info["estimated_cost_usd"]
+        "estimated_cost_usd": cost_info["estimated_cost_usd"],
+        "groundedness_pct":  groundedness["pct"],
+        "groundedness_label": groundedness["label"]
     }
 
     return {
