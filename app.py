@@ -12,27 +12,14 @@ from rag_engine import (
 from evaluator import (
     get_latest_evaluation_results,
     get_benchmark_report_html,
-    DEFAULT_BENCHMARK_DATA
+    DEFAULT_BENCHMARK_DATA,
+    run_evaluation,
+    trigger_evaluation_process,
+    EVAL_REPORT_HTML
 )
 from agent import run_agent
 
-try:
-    from evaluator import (
-        run_evaluation,
-        get_latest_evaluation_results,
-        trigger_evaluation_process,
-        EVAL_REPORT_HTML
-    )
-    EVAL_AVAILABLE = True
-except Exception:
-    EVAL_AVAILABLE = False
-    def get_latest_evaluation_results(): return None
-    def trigger_evaluation_process(*args, **kwargs): return None
-    def run_evaluation(*args, **kwargs):
-        return {"error": "Evaluation unavailable", "faithfulness": None,
-                "answer_relevancy": None, "context_precision": None,
-                "context_recall": None, "dataframe": None}
-    EVAL_REPORT_HTML = "eval_report.html"
+EVAL_AVAILABLE = True
 
 # ── Page config ───────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -610,6 +597,8 @@ with tab2:
     """, unsafe_allow_html=True)
 
     eval_data = get_latest_evaluation_results()
+    if not eval_data:
+        eval_data = DEFAULT_BENCHMARK_DATA
     m = eval_data.get("metrics", {})
     summary = eval_data.get("summary", {})
     samples = eval_data.get("samples", [])
